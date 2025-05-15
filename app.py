@@ -2,7 +2,8 @@
 
 import streamlit as st
 from etf_filter.calculator import run_filter_and_return
-from etf_filter.etf_universe import update_etf_csv
+from etf_filter.etf_universe import update_etf_csv_and_prices
+
 
 st.set_page_config(page_title="ETF 추세 필터", layout="centered")
 st.title("📈 ETF 추세 반등 추적기")
@@ -19,7 +20,7 @@ st.markdown("""
 ▲ 기준 시작점 (P₀)                   ▲ 반등 시작점 (P₁)                 ▲ 전일 종가 (P₂)
 
  - 하락률 계산   (P₁ - P₀) / P₀ * 100 
-                
+
  - 반등률 계산            (P₂ - P₁) / P₁ * 100
 
 
@@ -31,10 +32,10 @@ update_flag = st.checkbox("📌 거래량 기준 ETF 티커 업데이트(현재 
 
 if st.button("🔍 분석 시작(10초 이상 소요)"):
     if update_flag:
-        update_etf_csv()
+        update_etf_csv_and_prices()
         st.success("✅ ETF 목록이 성공적으로 갱신되었습니다.")
 
-    result_df,excluded_df = run_filter_and_return(x, y)
+    result_df, excluded_df = run_filter_and_return(x, y)
     if result_df.empty:
         st.warning("조건에 맞는 ETF가 없습니다.")
         st.dataframe(excluded_df)

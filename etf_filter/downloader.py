@@ -3,6 +3,19 @@
 import yfinance as yf
 from datetime import datetime, timedelta
 import pandas as pd
+import os
+from config.settings import ETF_PRICE_PATH  # 🔧 이 경로는 settings.py에서 정의해야 함
+
+# ⬇️ CSV 캐시 미리 불러오기
+if os.path.exists(ETF_PRICE_PATH):
+    try:
+        PRICE_CACHE = pd.read_csv(ETF_PRICE_PATH, parse_dates=["Date"])
+        PRICE_CACHE["Date"] = PRICE_CACHE["Date"].dt.date  # 날짜 타입 정리
+    except Exception as e:
+        print(f"⚠️ 캐시 파일 로딩 실패: {e}")
+        PRICE_CACHE = pd.DataFrame(columns=["Date", "Close", "Ticker"])
+else:
+    PRICE_CACHE = pd.DataFrame(columns=["Date", "Close", "Ticker"])
 
 
 def get_previous_business_day():
@@ -20,6 +33,13 @@ def get_previous_business_day():
 
 
 def get_price_on_date(ticker, date):
+    date_only = date.date() if isinstance(date, datetime) else date
+
+    # 1. 📦 CSV 캐시에서 먼저 찾기
+    filtered = PRICE_CACHE[(PRICE_CACHE['Ticker'] == ticker) & (PRICE_CACHE['Date'] == date_only)]
+    if not filtered.empty:
+        return float(filtered['Close'].iloc[0])
+
     try:
         # Ticker 객체 생성
         stock = yf.Ticker(ticker)

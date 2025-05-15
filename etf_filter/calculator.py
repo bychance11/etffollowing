@@ -41,7 +41,9 @@ def run_filter_and_return(x, y):
             })
         else:
             logs.append(f"{ticker}: prior={prior_return:.2f}%, recent={recent_return:.2f}% → 제외")
-            excluded.append({'Ticker': ticker, 'Reason': 'Did not meet criteria'})  # 제외된 ETF 저장
+            excluded.append({'Ticker': ticker,
+                             'Prior Return (%)': round(prior_return, 2),
+                             'Recent Return (%)': round(recent_return, 2)})  # 제외된 ETF 저장
 
     if logs:
         print("\n[필터링 로그]")
